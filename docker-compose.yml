@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+    depends_on:
+      - marzban
+    networks:
+      - proxy-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - proxy-network
+
+  marzban:
+    image: gozargah/marzban:latest
+    container_name: marzban
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./marzban-data:/var/lib/marzban
+      - ./xray-config:/var/lib/marzban/xray-core
+    ports:
+      - "8080:8080"
+    networks:
+      - proxy-network
+
+  hysteria2:
+    build:
+      context: ./hysteria2
+      dockerfile: Dockerfile
+    container_name: hysteria2
+    restart: always
+    ports:
+      - "443:443/udp"
+      - "8443:8443/udp"
+    volumes:
+      - ./hysteria2/config:/etc/hysteria
+      - ./certbot/conf:/etc/letsencrypt:ro
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    driver: bridge

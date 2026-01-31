@@ -1,0 +1,39 @@
+# Hysteria 2 Configuration
+listen: :443
+
+# TLS Configuration
+tls:
+  cert: /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/fullchain.pem
+  key: /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/privkey.pem
+
+# Authentication
+auth:
+  type: password
+  password: AUTH_PASSWORD_PLACEHOLDER
+
+# Bandwidth settings (adjust according to your server)
+bandwidth:
+  up: 1 gbps
+  down: 1 gbps
+
+# Masquerade settings
+masquerade:
+  type: proxy
+  proxy:
+    url: https://www.bing.com
+    rewriteHost: true
+
+# QUIC settings
+quic:
+  initStreamReceiveWindow: 8388608
+  maxStreamReceiveWindow: 8388608
+  initConnReceiveWindow: 20971520
+  maxConnReceiveWindow: 20971520
+  maxIdleTimeout: 30s
+  maxIncomingStreams: 1024
+  disablePathMTUDiscovery: false
+
+# Outbound settings
+outbounds:
+  - name: default
+    type: direct
