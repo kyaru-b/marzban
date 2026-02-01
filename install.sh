@@ -8,7 +8,7 @@ NC='\033[0m'
 
 echo -e "${BLUE}"
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║          Marzban + Hysteria 2 + Nginx Installer              ║"
+echo "║              H-UI (Hysteria 2) Installer                     ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 
@@ -39,10 +39,9 @@ install_docker() {
 # Создание директорий
 create_directories() {
     echo -e "${YELLOW}Создание директорий...${NC}"
-    mkdir -p nginx/conf.d
     mkdir -p certbot/www
     mkdir -p certbot/conf
-    mkdir -p marzban-data
+    mkdir -p h-ui-data
     echo -e "${GREEN}Директории созданы!${NC}"
 }
 
@@ -76,10 +75,10 @@ obtain_ssl() {
 
 # Запуск
 start_services() {
-    echo -e "${YELLOW}Запуск сервисов...${NC}"
+    echo -e "${YELLOW}Запуск H-UI...${NC}"
     docker compose down 2>/dev/null
     docker compose up -d
-    echo -e "${GREEN}Сервисы запущены!${NC}"
+    echo -e "${GREEN}H-UI запущен!${NC}"
 }
 
 # Информация
@@ -89,15 +88,12 @@ show_info() {
     echo -e "${GREEN}                 УСТАНОВКА ЗАВЕРШЕНА!${NC}"
     echo -e "${BLUE}══════════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo -e "${GREEN}Marzban Panel:${NC}"
-    echo -e "  URL:    https://$DOMAIN"
+    echo -e "${GREEN}H-UI Panel (Hysteria 2):${NC}"
+    echo -e "  URL:    https://$DOMAIN:8081"
     echo -e "  Логин:  admin"
-    echo -e "  Пароль: Admin123456"
+    echo -e "  Пароль: admin"
     echo ""
-    echo -e "${YELLOW}Настройка Hysteria 2 в Marzban:${NC}"
-    echo -e "  1. Войдите в панель"
-    echo -e "  2. Перейдите в Core Settings"  
-    echo -e "  3. Добавьте Hysteria 2 inbound с портом 8443/udp"
+    echo -e "${YELLOW}ВАЖНО: Смените пароль после первого входа!${NC}"
     echo ""
     echo -e "${BLUE}Команды:${NC}"
     echo -e "  docker compose ps        # Статус"
@@ -113,8 +109,8 @@ main() {
     obtain_ssl
     start_services
     
-    echo -e "${YELLOW}Ожидание запуска Marzban (30 сек)...${NC}"
-    sleep 30
+    echo -e "${YELLOW}Ожидание запуска H-UI (15 сек)...${NC}"
+    sleep 15
     
     docker compose ps
     show_info

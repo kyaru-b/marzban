@@ -1,35 +1,24 @@
 services:
-  nginx:
-    image: nginx:alpine
-    container_name: nginx-proxy
+  h-ui:
+    image: jonssonyan/h-ui:latest
+    container_name: h-ui
     restart: always
     ports:
+      - "443:443/udp"
+      - "443:443/tcp"
       - "80:80"
-      - "443:443"
+      - "8081:8081"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./h-ui-data:/h-ui/data
       - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
-    depends_on:
-      - marzban
-    networks:
-      - proxy-network
-
-  marzban:
-    image: gozargah/marzban:latest
-    container_name: marzban
-    restart: always
-    env_file:
-      - .env
-    volumes:
-      - ./marzban-data:/var/lib/marzban
-      - ./certbot/conf:/etc/letsencrypt:ro
-    ports:
-      - "8080:8080"
-      - "8443:8443/udp"
-    networks:
-      - proxy-network
+    environment:
+      - TZ=Europe/Moscow
+    command: >
+      ./h-ui
+      -p 8081
+      --cert /etc/letsencrypt/live/hystori.neoproxy.online/fullchain.pem
+      --key /etc/letsencrypt/live/hystori.neoproxy.online/privkey.pem
 
 networks:
-  proxy-network:
+  default:
     driver: bridge
